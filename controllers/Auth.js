@@ -78,9 +78,36 @@ const forgotPassword = async (req, res) => {
     }
 }
 
+const resetPassword = async (req, res) => {
+    try {
+        const { token, password, confirmPassword } = req.body;
+        if (!token) {
+            return res.status(400).json({ message: 'Token es requerido' });
+        }
+        const user = await User.findOne({ where: { token } });
+        if (!user) {
+            return res.status(400).json({ message: 'El token es inválido o ha expirado. Por favor solicita un nuevo enlace' });
+        }
+        if (password !== confirmPassword) {
+            return res.status(400).json({ message: 'Las contraseñas no coinciden' });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        user.password = hashedPassword;
+        user.token = null;
+        await user.save();
+
+        res.status(200).json({ message: 'Contraseña restablecida exitosamente' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error interno del servidor' });
+    }
+};
+
 module.exports = {
     login,
     register,
     logout,
-    forgotPassword
+    forgotPassword,
+    resetPassword
 }
