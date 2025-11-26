@@ -43,7 +43,12 @@ const register = async (req, res) => {
 
         const user = await User.create({ name, email, password: hashedPassword });
 
-        res.status(201).json({ message: 'User registered successfully', user });
+        const token = generateToken(user.id);
+        res.cookie('token', token, getCookieOptions());        
+
+        const { password: _, ...userData } = user.toJSON();
+
+        res.status(201).json({ message: 'User registered successfully', user: userData });
     } catch (error) {
         res.status(500).json({ message: 'Error interno del servidor'}); 
     }
