@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const { v4: uuid } = require('uuid');
 const User = require('../models/User');
 const { generateToken, getCookieOptions } = require('../utils/jwt');
+const { sendEmail } = require('./Email');
 
 
 const login = async (req, res) => {
@@ -17,9 +18,7 @@ const login = async (req, res) => {
         }
 
         const token = generateToken(user.id);
-        res.cookie('token', token, getCookieOptions());
-        console.log(uuid());
-        
+        res.cookie('token', token, getCookieOptions());        
 
         const { password: _, ...userData } = user.toJSON();
 
@@ -70,7 +69,7 @@ const forgotPassword = async (req, res) => {
         user.token = token;
         await user.save();
 
-        // Aquí enviarías el email con el token para restablecer la contraseña
+        await sendEmail(user.email, user.name, token, 'forgot-password');
 
         res.status(200).json({ message: 'Se ha enviado un email con instrucciones para recuperar tu contraseña' });
     } catch (error) {
