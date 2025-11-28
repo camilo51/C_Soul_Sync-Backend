@@ -6,8 +6,15 @@ const { authenticate } = require('./middlewares/AuthMiddleware');
 
 const router = express.Router();
 
-router.get('/spotify/token', Spotify.getToken)
-router.get('/spotify/tracks', Spotify.getTracks)
+router.get('/spotify/all', Spotify.getAll);
+router.get('/spotify/tracks', Spotify.getTracks);
+router.get('/spotify/albums', Spotify.getAlbums);
+router.get('/spotify/artists', Spotify.getArtists);
+router.get('/spotify/playlists', Spotify.getPlaylists);
+router.get('/spotify/track', Spotify.getTrack);
+router.get('/spotify/album', Spotify.getAlbum);
+router.get('/spotify/artist', Spotify.getArtist);
+router.get('/spotify/playlist', Spotify.getPlaylist);
 
 router.post('/auth/login', Auth.login);
 router.post('/auth/register', Auth.register);
