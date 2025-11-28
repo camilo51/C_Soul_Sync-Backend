@@ -1,6 +1,4 @@
-
 class Messages {
-
     success(message, data = {}) {
         return {
             "success": true,
