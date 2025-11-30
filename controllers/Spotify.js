@@ -1,5 +1,5 @@
+const moods = require('../constants/moods');
 const messages = require('../utils/messages');
-const letras = require('../constants/letras');
 require('dotenv').config();
 
 class Spotify {
@@ -47,11 +47,11 @@ class Spotify {
             res.status(500).json(messages.error('Error al obtener las canciones de Spotify'));
         }
     }
-    searchStack = async (req, res, type) => {
+    getStack = async (req, res) => {
         await this.getToken(req, res);
-        const { search } = req.query;
-        const letraAleatoria = letras[Math.floor(Math.random() * letras.length)];
-        
+        const { mood } = req.query;
+        const { type } = req.params;
+
         const messages_map = {
             track: 'Canciones',
             album: 'Álbumes',
@@ -59,12 +59,18 @@ class Spotify {
             playlist: 'Playlists'
         };
         
+        const letras = 'abcdefghijklmnopqrstuvwxyz';
+        const letraAleatoria = letras[Math.floor(Math.random() * letras.length)];
+
+        const generos = moods.filter(m => m.name === mood)
+        
+
         try {
-            const response = await fetch(`https://api.spotify.com/v1/search?q=${search} ${letraAleatoria}&type=${type}&limit=10`,{
+            const response = await fetch(`https://api.spotify.com/v1/search?q=${letraAleatoria} genre: ${generos[0].generos}&type=${type}&limit=10`,{
                     headers: {
                         'Authorization': `Bearer ${this.token}`
                     }
-                });
+            });
             const data = await response.json();
             res.json(messages.success(`${messages_map[type]} obtenidos con éxito`, data));
         } catch (error) {
@@ -93,19 +99,6 @@ class Spotify {
         } catch (error) {
             res.status(500).json(messages.error(`Error al obtener ${messages_map[type].toLowerCase()} de Spotify`));
         }
-    }
-    
-    getTracks = async (req, res) => {
-        await this.searchStack(req, res, 'track');
-    }
-    getAlbums = async (req, res) => {
-        await this.searchStack(req, res, 'album');
-    }
-    getArtists = async (req, res) => {
-        await this.searchStack(req, res, 'artist');
-    }
-    getPlaylists = async (req, res) => {
-        await this.searchStack(req, res, 'playlist');
     }
 
     getTrack = async (req, res) => {
