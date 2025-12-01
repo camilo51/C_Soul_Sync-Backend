@@ -66,7 +66,7 @@ class Spotify {
         
 
         try {
-            const response = await fetch(`https://api.spotify.com/v1/search?q=${letraAleatoria} genre: ${generos[0].generos}&type=${type}&limit=10`,{
+            const response = await fetch(`https://api.spotify.com/v1/search?q=${letraAleatoria} genre: ${generos[0].generos}&type=${type}&limit=50`,{
                     headers: {
                         'Authorization': `Bearer ${this.token}`
                     }
