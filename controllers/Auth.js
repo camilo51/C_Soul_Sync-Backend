@@ -109,6 +109,46 @@ const resetPassword = async (req, res) => {
     }
 };
 
+const updateUser = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { name } = req.body;
+
+        if (!name) {
+            return res.status(400).json(messages.error('El nombre es requerido'));
+        }
+
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json(messages.error('Usuario no encontrado'));
+        }
+
+        user.name = name;
+        await user.save();
+
+        const { password: _, ...userData } = user.toJSON();
+
+        res.status(200).json(messages.success('Nombre actualizado exitosamente', { user: userData }));
+    } catch (error) {
+        res.status(500).json(messages.error('Error interno del servidor'));
+    }
+};
+
+const DeleteUser = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json(messages.error('Usuario no encontrado'));
+        }
+
+        await user.destroy();
+        res.clearCookie('token', getCookieOptions());
+        res.status(200).json(messages.success('Usuario eliminado exitosamente'));
+    } catch (error) {
+        res.status(500).json(messages.error('Error interno del servidor'));
+    } 
+}
 
 module.exports = {
     login,
@@ -116,4 +156,6 @@ module.exports = {
     logout,
     forgotPassword,
     resetPassword,
+    updateUser,
+    DeleteUser
 }
