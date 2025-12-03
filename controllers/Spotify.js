@@ -33,10 +33,12 @@ class Spotify {
 
     getAll = async (req, res) => {
         await this.getToken(req, res);
-        const {search} = req.query;
+        const {mood} = req.query;
+        const letras = 'abcdefghijklmnopqrstuvwxyz';
         const letraAleatoria = letras[Math.floor(Math.random() * letras.length)];
+        const generos = moods.filter(m => m.name === mood)
         try {
-            const response = await fetch(`https://api.spotify.com/v1/search?q=${search} ${letraAleatoria}&type=track,artist,album,playlist&limit=10`, {
+            const response = await fetch(`https://api.spotify.com/v1/search?q=${letraAleatoria} genre: ${generos[0].generos}&type=track,artist,album,playlist&limit=5`, {
                 headers: {
                     'Authorization': `Bearer ${this.token}`
                 }
@@ -64,7 +66,6 @@ class Spotify {
 
         const generos = moods.filter(m => m.name === mood)
         
-
         try {
             const response = await fetch(`https://api.spotify.com/v1/search?q=${letraAleatoria} genre: ${generos[0].generos}&type=${type}&limit=50`,{
                     headers: {
@@ -75,6 +76,21 @@ class Spotify {
             res.json(messages.success(`${messages_map[type]} obtenidos con éxito`, data));
         } catch (error) {
             res.status(500).json(messages.error(`Error al obtener los ${messages_map[type].toLowerCase()} de Spotify`));
+        }
+    }
+    getCategories = async (req, res) => {
+        await this.getToken(req, res);
+
+        try {
+            const response = await fetch('https://api.spotify.com/v1/browse/categories?locale=es_CO&limit=50', {
+                headers: {
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+            const data = await response.json();
+            res.json(messages.success('Categorías obtenidas con éxito', data));
+        } catch (error) {
+            res.status(500).json(messages.error('Error al obtener las categorías de Spotify'));
         }
     }
     searchItem = async (req, res, type) => {
